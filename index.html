@@ -16,7 +16,7 @@
             background: #0f172a;
             color: #e2e8f0;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
 
         .container {
@@ -25,145 +25,117 @@
         }
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 300;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 14px;
             color: #94a3b8;
         }
 
-        .coords-display {
+        /* Velocidad y rumbo en línea */
+        .motion-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .motion-card {
             background: #1e293b;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 12px;
             text-align: center;
         }
 
-        .coord-label {
-            font-size: 0.75rem;
+        .card-label {
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: #64748b;
             margin-bottom: 4px;
         }
 
-        .coord-value {
-            font-size: 1.5rem;
-            font-family: 'SF Mono', 'Consolas', monospace;
-            color: #38bdf8;
-            margin-bottom: 16px;
-        }
-
-        .coord-value:last-child {
-            margin-bottom: 0;
-        }
-
-        .accuracy {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 12px;
-        }
-
-        /* Velocidad y brújula */
-        .motion-display {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .motion-card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
         .speed-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-family: 'SF Mono', 'Consolas', monospace;
             color: #4ade80;
+            line-height: 1;
         }
 
         .speed-unit {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .compass-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-        }
-
-        .compass-ring {
-            width: 100%;
-            height: 100%;
-            border: 2px solid #334155;
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .compass-needle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 4px;
-            height: 36px;
-            transform-origin: bottom center;
-            transform: translate(-50%, -100%);
-            transition: transform 0.3s ease-out;
-        }
-
-        .compass-needle::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 20px solid #ef4444;
-            transform: translateX(-4px);
-        }
-
-        .compass-needle::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 16px solid #64748b;
-            transform: translateX(-4px);
-        }
-
-        .compass-n {
-            position: absolute;
-            top: -2px;
-            left: 50%;
-            transform: translateX(-50%);
             font-size: 0.7rem;
-            font-weight: bold;
-            color: #ef4444;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* Rumbo compacto */
+        .heading-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .heading-arrow {
+            font-size: 1.4rem;
+            transition: transform 0.3s ease-out;
+            color: #38bdf8;
+        }
+
+        .heading-info {
+            text-align: left;
         }
 
         .heading-value {
-            font-size: 0.85rem;
+            font-size: 1.3rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            color: #38bdf8;
+            line-height: 1;
+        }
+
+        .heading-cardinal {
+            font-size: 0.75rem;
             color: #64748b;
-            margin-top: 8px;
+            margin-top: 2px;
+        }
+
+        /* Coordenadas compactas */
+        .coords-compact {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+
+        .coords-compact .coord-item {
+            text-align: center;
+        }
+
+        .coords-compact .coord-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        .coords-compact .coord-value {
+            font-size: 0.95rem;
+            color: #38bdf8;
+        }
+
+        .coords-compact .accuracy {
+            font-size: 0.7rem;
+            color: #64748b;
         }
 
         .status {
             text-align: center;
-            padding: 12px;
-            font-size: 0.85rem;
+            padding: 6px;
+            font-size: 0.75rem;
             color: #94a3b8;
         }
 
@@ -171,15 +143,46 @@
             color: #f87171;
         }
 
+        /* Botón guardar GRANDE */
+        .btn-save {
+            width: 100%;
+            padding: 26px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 10px;
+            background: #22c55e;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-save:hover {
+            background: #16a34a;
+        }
+
+        .btn-save:active {
+            transform: scale(0.98);
+            background: #15803d;
+        }
+
+        .btn-save:disabled {
+            background: #334155;
+            color: #64748b;
+        }
+
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 12px;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .btn-primary {
@@ -187,39 +190,26 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
         .btn-primary:active {
             transform: scale(0.98);
         }
 
-        .btn-secondary {
-            background: #334155;
-            color: #e2e8f0;
-        }
-
-        .btn-secondary:hover {
-            background: #475569;
-        }
-
         .saved-list {
-            margin-top: 30px;
+            margin-top: 16px;
         }
 
         .saved-list h2 {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 400;
             color: #64748b;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .saved-item {
             background: #1e293b;
             border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -227,13 +217,13 @@
 
         .saved-coords {
             font-family: 'SF Mono', 'Consolas', monospace;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #94a3b8;
         }
 
         .saved-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .saved-actions button {
@@ -242,7 +232,7 @@
             color: #64748b;
             cursor: pointer;
             padding: 4px 8px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             border-radius: 4px;
         }
 
@@ -258,8 +248,8 @@
         .empty-state {
             text-align: center;
             color: #475569;
-            font-size: 0.85rem;
-            padding: 20px;
+            font-size: 0.75rem;
+            padding: 14px;
         }
     </style>
 </head>
@@ -267,37 +257,46 @@
     <div class="container">
         <h1>📍 GPS Tracker</h1>
 
-        <!-- Velocidad y Brújula -->
+        <!-- Velocidad y Rumbo -->
         <div class="motion-display">
             <div class="motion-card">
-                <div class="coord-label">Velocidad</div>
+                <div class="card-label">Velocidad</div>
                 <div class="speed-value" id="speed">--</div>
                 <div class="speed-unit">km/h</div>
             </div>
             <div class="motion-card">
-                <div class="coord-label">Brújula</div>
-                <div class="compass-container">
-                    <div class="compass-ring">
-                        <span class="compass-n">N</span>
-                        <div class="compass-needle" id="needle"></div>
+                <div class="card-label">Rumbo</div>
+                <div class="heading-display">
+                    <span class="heading-arrow" id="arrow">➤</span>
+                    <div class="heading-info">
+                        <div class="heading-value" id="heading">--°</div>
+                        <div class="heading-cardinal" id="cardinal">--</div>
                     </div>
                 </div>
-                <div class="heading-value" id="heading">--°</div>
             </div>
         </div>
 
-        <div class="coords-display">
-            <div class="coord-label">Latitud</div>
-            <div class="coord-value" id="lat">--</div>
-            <div class="coord-label">Longitud</div>
-            <div class="coord-value" id="lon">--</div>
-            <div class="accuracy" id="accuracy"></div>
+        <!-- Coordenadas compactas -->
+        <div class="coords-compact">
+            <div class="coord-item">
+                <div class="coord-label">Lat</div>
+                <div class="coord-value" id="lat">--</div>
+            </div>
+            <div class="coord-item">
+                <div class="coord-label">Lon</div>
+                <div class="coord-value" id="lon">--</div>
+            </div>
+            <div class="coord-item">
+                <div class="accuracy" id="accuracy">±--m</div>
+            </div>
         </div>
 
         <div class="status" id="status">Pulsa iniciar para comenzar</div>
 
+        <!-- Botón GUARDAR grande -->
+        <button class="btn-save" id="btnSave" onclick="saveCoords()" disabled>📌 Guardar</button>
+
         <button class="btn btn-primary" id="btnToggle" onclick="toggleGPS()">Iniciar GPS</button>
-        <button class="btn btn-secondary" id="btnSave" onclick="saveCoords()" disabled>Guardar posición</button>
 
         <div class="saved-list">
             <h2>Posiciones guardadas</h2>
@@ -309,7 +308,6 @@
         let watchId = null;
         let currentCoords = null;
         let savedPositions = JSON.parse(localStorage.getItem('savedPositions') || '[]');
-        let compassEnabled = false;
 
         function toggleGPS() {
             if (watchId) {
@@ -333,19 +331,32 @@
                         lat: position.coords.latitude,
                         lon: position.coords.longitude,
                         accuracy: position.coords.accuracy,
-                        speed: position.coords.speed
+                        speed: position.coords.speed,
+                        heading: position.coords.heading
                     };
                     
                     document.getElementById('lat').textContent = currentCoords.lat.toFixed(6);
                     document.getElementById('lon').textContent = currentCoords.lon.toFixed(6);
-                    document.getElementById('accuracy').textContent = `Precisión: ±${Math.round(currentCoords.accuracy)}m`;
+                    document.getElementById('accuracy').textContent = `±${Math.round(currentCoords.accuracy)}m`;
                     
-                    // Velocidad (viene en m/s, convertimos a km/h)
+                    // Velocidad (m/s → km/h)
                     if (currentCoords.speed !== null && currentCoords.speed > 0) {
                         const kmh = (currentCoords.speed * 3.6).toFixed(1);
                         document.getElementById('speed').textContent = kmh;
                     } else {
                         document.getElementById('speed').textContent = '0';
+                    }
+                    
+                    // Rumbo de movimiento
+                    if (currentCoords.heading !== null && currentCoords.speed > 0.5) {
+                        const h = Math.round(currentCoords.heading);
+                        document.getElementById('heading').textContent = h + '°';
+                        document.getElementById('cardinal').textContent = getCardinal(h);
+                        document.getElementById('arrow').style.transform = `rotate(${h}deg)`;
+                    } else {
+                        document.getElementById('heading').textContent = '--°';
+                        document.getElementById('cardinal').textContent = 'parado';
+                        document.getElementById('arrow').style.transform = 'rotate(0deg)';
                     }
                     
                     showStatus('GPS activo');
@@ -360,9 +371,6 @@
                 }
             );
 
-            // Iniciar brújula
-            startCompass();
-
             document.getElementById('btnToggle').textContent = 'Detener GPS';
         }
 
@@ -371,64 +379,15 @@
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
             }
-            stopCompass();
             document.getElementById('btnToggle').textContent = 'Iniciar GPS';
             document.getElementById('btnSave').disabled = true;
             showStatus('GPS detenido');
         }
 
-        // Brújula
-        function startCompass() {
-            if (compassEnabled) return;
-
-            // iOS requiere permiso explícito
-            if (typeof DeviceOrientationEvent !== 'undefined' && 
-                typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(response => {
-                        if (response === 'granted') {
-                            enableCompass();
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                enableCompass();
-            }
-        }
-
-        function enableCompass() {
-            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-            window.addEventListener('deviceorientation', handleOrientation, true);
-            compassEnabled = true;
-        }
-
-        function stopCompass() {
-            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
-            window.removeEventListener('deviceorientation', handleOrientation, true);
-            compassEnabled = false;
-        }
-
-        function handleOrientation(event) {
-            let heading = null;
-
-            // Intentar obtener el heading absoluto
-            if (event.webkitCompassHeading !== undefined) {
-                // iOS
-                heading = event.webkitCompassHeading;
-            } else if (event.absolute && event.alpha !== null) {
-                // Android con orientación absoluta
-                heading = 360 - event.alpha;
-            } else if (event.alpha !== null) {
-                // Fallback
-                heading = 360 - event.alpha;
-            }
-
-            if (heading !== null) {
-                heading = Math.round(heading);
-                document.getElementById('heading').textContent = heading + '°';
-                document.getElementById('needle').style.transform = 
-                    `translate(-50%, -100%) rotate(${heading}deg)`;
-            }
+        function getCardinal(deg) {
+            const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+            const index = Math.round(deg / 45) % 8;
+            return dirs[index];
         }
 
         function saveCoords() {
@@ -443,6 +402,11 @@
             savedPositions.unshift(position);
             localStorage.setItem('savedPositions', JSON.stringify(savedPositions));
             renderSavedItems();
+            
+            // Feedback visual
+            const btn = document.getElementById('btnSave');
+            btn.textContent = '✓ Guardado';
+            setTimeout(() => { btn.textContent = '📌 Guardar'; }, 1000);
         }
 
         function deletePosition(index) {
@@ -467,7 +431,7 @@
                 <div class="saved-item">
                     <div>
                         <div class="saved-coords">${pos.lat.toFixed(6)}, ${pos.lon.toFixed(6)}</div>
-                        <div style="font-size: 0.7rem; color: #475569; margin-top: 4px;">${pos.timestamp}</div>
+                        <div style="font-size: 0.6rem; color: #475569; margin-top: 2px;">${pos.timestamp}</div>
                     </div>
                     <div class="saved-actions">
                         <button class="maps-link" onclick="openInMaps(${pos.lat}, ${pos.lon})">Maps</button>
