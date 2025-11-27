@@ -65,6 +65,101 @@
             margin-top: 12px;
         }
 
+        /* Velocidad y brújula */
+        .motion-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .motion-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .speed-value {
+            font-size: 2rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            color: #4ade80;
+        }
+
+        .speed-unit {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .compass-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+
+        .compass-ring {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .compass-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 36px;
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .compass-needle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 20px solid #ef4444;
+            transform: translateX(-4px);
+        }
+
+        .compass-needle::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 16px solid #64748b;
+            transform: translateX(-4px);
+        }
+
+        .compass-n {
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .heading-value {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+
         .status {
             text-align: center;
             padding: 12px;
@@ -172,6 +267,25 @@
     <div class="container">
         <h1>📍 GPS Tracker</h1>
 
+        <!-- Velocidad y Brújula -->
+        <div class="motion-display">
+            <div class="motion-card">
+                <div class="coord-label">Velocidad</div>
+                <div class="speed-value" id="speed">--</div>
+                <div class="speed-unit">km/h</div>
+            </div>
+            <div class="motion-card">
+                <div class="coord-label">Brújula</div>
+                <div class="compass-container">
+                    <div class="compass-ring">
+                        <span class="compass-n">N</span>
+                        <div class="compass-needle" id="needle"></div>
+                    </div>
+                </div>
+                <div class="heading-value" id="heading">--°</div>
+            </div>
+        </div>
+
         <div class="coords-display">
             <div class="coord-label">Latitud</div>
             <div class="coord-value" id="lat">--</div>
@@ -195,6 +309,7 @@
         let watchId = null;
         let currentCoords = null;
         let savedPositions = JSON.parse(localStorage.getItem('savedPositions') || '[]');
+        let compassEnabled = false;
 
         function toggleGPS() {
             if (watchId) {
@@ -217,12 +332,21 @@
                     currentCoords = {
                         lat: position.coords.latitude,
                         lon: position.coords.longitude,
-                        accuracy: position.coords.accuracy
+                        accuracy: position.coords.accuracy,
+                        speed: position.coords.speed
                     };
                     
                     document.getElementById('lat').textContent = currentCoords.lat.toFixed(6);
                     document.getElementById('lon').textContent = currentCoords.lon.toFixed(6);
                     document.getElementById('accuracy').textContent = `Precisión: ±${Math.round(currentCoords.accuracy)}m`;
+                    
+                    // Velocidad (viene en m/s, convertimos a km/h)
+                    if (currentCoords.speed !== null && currentCoords.speed > 0) {
+                        const kmh = (currentCoords.speed * 3.6).toFixed(1);
+                        document.getElementById('speed').textContent = kmh;
+                    } else {
+                        document.getElementById('speed').textContent = '0';
+                    }
                     
                     showStatus('GPS activo');
                     document.getElementById('btnSave').disabled = false;
@@ -236,6 +360,9 @@
                 }
             );
 
+            // Iniciar brújula
+            startCompass();
+
             document.getElementById('btnToggle').textContent = 'Detener GPS';
         }
 
@@ -244,9 +371,64 @@
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
             }
+            stopCompass();
             document.getElementById('btnToggle').textContent = 'Iniciar GPS';
             document.getElementById('btnSave').disabled = true;
             showStatus('GPS detenido');
+        }
+
+        // Brújula
+        function startCompass() {
+            if (compassEnabled) return;
+
+            // iOS requiere permiso explícito
+            if (typeof DeviceOrientationEvent !== 'undefined' && 
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            enableCompass();
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                enableCompass();
+            }
+        }
+
+        function enableCompass() {
+            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.addEventListener('deviceorientation', handleOrientation, true);
+            compassEnabled = true;
+        }
+
+        function stopCompass() {
+            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.removeEventListener('deviceorientation', handleOrientation, true);
+            compassEnabled = false;
+        }
+
+        function handleOrientation(event) {
+            let heading = null;
+
+            // Intentar obtener el heading absoluto
+            if (event.webkitCompassHeading !== undefined) {
+                // iOS
+                heading = event.webkitCompassHeading;
+            } else if (event.absolute && event.alpha !== null) {
+                // Android con orientación absoluta
+                heading = 360 - event.alpha;
+            } else if (event.alpha !== null) {
+                // Fallback
+                heading = 360 - event.alpha;
+            }
+
+            if (heading !== null) {
+                heading = Math.round(heading);
+                document.getElementById('heading').textContent = heading + '°';
+                document.getElementById('needle').style.transform = 
+                    `translate(-50%, -100%) rotate(${heading}deg)`;
+            }
         }
 
         function saveCoords() {
