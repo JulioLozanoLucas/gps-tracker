@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #94a3b8;
+        }
+
+        .coords-display {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .coord-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .coord-value {
+            font-size: 1.5rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            color: #38bdf8;
+            margin-bottom: 16px;
+        }
+
+        .coord-value:last-child {
+            margin-bottom: 0;
+        }
+
+        .accuracy {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 12px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .status.error {
+            color: #f87171;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .saved-list {
+            margin-top: 30px;
+        }
+
+        .saved-list h2 {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .saved-item {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .saved-coords {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .saved-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .saved-actions button {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        .saved-actions button:hover {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .saved-actions .maps-link {
+            color: #4ade80;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #475569;
+            font-size: 0.85rem;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📍 GPS Tracker</h1>
+
+        <div class="coords-display">
+            <div class="coord-label">Latitud</div>
+            <div class="coord-value" id="lat">--</div>
+            <div class="coord-label">Longitud</div>
+            <div class="coord-value" id="lon">--</div>
+            <div class="accuracy" id="accuracy"></div>
+        </div>
+
+        <div class="status" id="status">Pulsa iniciar para comenzar</div>
+
+        <button class="btn btn-primary" id="btnToggle" onclick="toggleGPS()">Iniciar GPS</button>
+        <button class="btn btn-secondary" id="btnSave" onclick="saveCoords()" disabled>Guardar posición</button>
+
+        <div class="saved-list">
+            <h2>Posiciones guardadas</h2>
+            <div id="savedItems"></div>
+        </div>
+    </div>
+
+    <script>
+        let watchId = null;
+        let currentCoords = null;
+        let savedPositions = JSON.parse(localStorage.getItem('savedPositions') || '[]');
+
+        function toggleGPS() {
+            if (watchId) {
+                stopGPS();
+            } else {
+                startGPS();
+            }
+        }
+
+        function startGPS() {
+            if (!navigator.geolocation) {
+                showStatus('Tu navegador no soporta geolocalización', true);
+                return;
+            }
+
+            showStatus('Obteniendo ubicación...');
+            
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    currentCoords = {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude,
+                        accuracy: position.coords.accuracy
+                    };
+                    
+                    document.getElementById('lat').textContent = currentCoords.lat.toFixed(6);
+                    document.getElementById('lon').textContent = currentCoords.lon.toFixed(6);
+                    document.getElementById('accuracy').textContent = `Precisión: ±${Math.round(currentCoords.accuracy)}m`;
+                    
+                    showStatus('GPS activo');
+                    document.getElementById('btnSave').disabled = false;
+                },
+                (error) => {
+                    showStatus('Error: ' + getErrorMessage(error), true);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                }
+            );
+
+            document.getElementById('btnToggle').textContent = 'Detener GPS';
+        }
+
+        function stopGPS() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            document.getElementById('btnToggle').textContent = 'Iniciar GPS';
+            document.getElementById('btnSave').disabled = true;
+            showStatus('GPS detenido');
+        }
+
+        function saveCoords() {
+            if (!currentCoords) return;
+
+            const position = {
+                lat: currentCoords.lat,
+                lon: currentCoords.lon,
+                timestamp: new Date().toLocaleString('es-ES')
+            };
+
+            savedPositions.unshift(position);
+            localStorage.setItem('savedPositions', JSON.stringify(savedPositions));
+            renderSavedItems();
+        }
+
+        function deletePosition(index) {
+            savedPositions.splice(index, 1);
+            localStorage.setItem('savedPositions', JSON.stringify(savedPositions));
+            renderSavedItems();
+        }
+
+        function openInMaps(lat, lon) {
+            window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+        }
+
+        function renderSavedItems() {
+            const container = document.getElementById('savedItems');
+            
+            if (savedPositions.length === 0) {
+                container.innerHTML = '<div class="empty-state">No hay posiciones guardadas</div>';
+                return;
+            }
+
+            container.innerHTML = savedPositions.map((pos, i) => `
+                <div class="saved-item">
+                    <div>
+                        <div class="saved-coords">${pos.lat.toFixed(6)}, ${pos.lon.toFixed(6)}</div>
+                        <div style="font-size: 0.7rem; color: #475569; margin-top: 4px;">${pos.timestamp}</div>
+                    </div>
+                    <div class="saved-actions">
+                        <button class="maps-link" onclick="openInMaps(${pos.lat}, ${pos.lon})">Maps</button>
+                        <button onclick="deletePosition(${i})">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status' + (isError ? ' error' : '');
+        }
+
+        function getErrorMessage(error) {
+            switch (error.code) {
+                case 1: return 'Permiso denegado';
+                case 2: return 'Posición no disponible';
+                case 3: return 'Tiempo de espera agotado';
+                default: return 'Error desconocido';
+            }
+        }
+
+        // Inicializar
+        renderSavedItems();
+    </script>
+</body>
+</html>
